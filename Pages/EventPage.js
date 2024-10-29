@@ -225,10 +225,10 @@ export function EventPage({ route, navigation,
 
     //console.log(removedOrganizers);
 
-    //find image
+    //find image after getting doc
     useEffect(() => {
         const func = async() => {
-          console.log('event/'+ eventID + '.' + imgType);
+          //console.log('event/'+ eventID + '.' + imgType);
           const imgReference = ref(storage, 'event/'+ eventID + '.' + imgType);
           await getDownloadURL(imgReference).then((x)=>{
             setimgState(x);
@@ -244,7 +244,7 @@ export function EventPage({ route, navigation,
           );
         }
         
-        if (eventDoc && !imgState){
+        if (eventDoc && !imgState){ //if alread hv img chose from local dont run
           func();
         }
     

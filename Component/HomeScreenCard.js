@@ -4,6 +4,8 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 
 import * as RootNavigation from '../ContextAndConfig/RootNavigation';
 
+import { CommonActions } from '@react-navigation/native';
+
 export default function HomeScreenCard({ }) {
 
     return(
@@ -11,7 +13,8 @@ export default function HomeScreenCard({ }) {
             <Pressable style={homeScreenCardStyles.iconColumn}>
                 <Icon name="add" size={50} color="#333" 
                     onPress={()=>{
-                        RootNavigation.navigate('New event')
+                        RootNavigation.navigate('Events', {screen: 'List'});
+                        RootNavigation.navigate('Events', {screen: 'New event'});
                     }}/>
                 <Text style={homeScreenCardStyles.iconColumnText}>New Event</Text>
             </Pressable>
@@ -22,7 +25,7 @@ export default function HomeScreenCard({ }) {
             <Pressable style={homeScreenCardStyles.iconColumn}>
                 <Icon name="list-alt" size={50} color="#333"
                     onPress={()=>{
-                        RootNavigation.navigate('Events')
+                        RootNavigation.navigate('Events', {screen: 'List'})
                     }}/>
                 <Text style={homeScreenCardStyles.iconColumnText}>Event List</Text>
             </Pressable>
