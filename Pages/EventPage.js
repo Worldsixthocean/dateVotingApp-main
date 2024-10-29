@@ -244,7 +244,7 @@ export function EventPage({ route, navigation,
           );
         }
         
-        if (eventDoc){
+        if (eventDoc && !imgState){
           func();
         }
     
@@ -273,10 +273,10 @@ export function EventPage({ route, navigation,
                         <Image style={{height:300, width:'100%'}} source={{uri:imgState}}/>
                     </> : 
                     (!!imgType == !!eventDoc ) ? //complicated logic
-                    <View style={{width:'100%', alignItems:'center', paddingTop: 20}}>
-                        <Icon name="hourglass-empty" size={25} color="#aaa" />
-                        <Text style={{color:"#aaa"}}>Loading Image</Text>
-                    </View> :
+                        <View style={{width:'100%', alignItems:'center', paddingTop: 20}}>
+                            <Icon name="hourglass-empty" size={25} color="#aaa" />
+                            <Text style={{color:"#aaa"}}>Loading Image</Text>
+                        </View> :
                     (
                         <Pressable style={{width:'100%', alignItems:'center', paddingTop: 20}}
                             onPress={async ()=>{
@@ -286,7 +286,7 @@ export function EventPage({ route, navigation,
                                 setimgType(x.assets[0].mimeType.replace('image/',''));
                                 }
                                 else{
-                                console.log(x.canceled);
+                                console.log('canceled');
                                 }
                             }}
                         >
