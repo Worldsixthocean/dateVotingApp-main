@@ -5,7 +5,9 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import Icon from 'react-native-vector-icons/MaterialIcons';
+import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+
 import DateTimePicker from '@react-native-community/datetimepicker';
 
 import { doc, getDoc, onSnapshot,Timestamp, toDate } from "firebase/firestore";
@@ -86,6 +88,7 @@ export function EventPage({ route, navigation,
 
     const [imgState, setimgState] = useState();
     const [imgType, setimgType] = useState();
+    const [imgChanged, setImgChanged] = useState(false);
 
     const [eventName, setEventName] = useState('');
     const [details, setDetails] = useState('');
@@ -101,14 +104,34 @@ export function EventPage({ route, navigation,
 
     const [shownDate, setShownDate] = useState(new Date());
 
-    const handleSubmit = ()=>{
-        if(imgState){
-            uploadEventPic(eventID, imgState, '.' + imgType)    
-        }
+    const handleSubmit = async ()=> {
+
+        p1 = 0;
+
         if(eventName.trim() && times.length && attenders.length){
-        editEvent(user, eventID, eventName, details, attenders, times, organizers, removedAttenders, removedOrganizers, pending, removedPendings, imgType || '')
+            if(imgChanged){
+                if(imgState){
+                    p1 = uploadEventPic(eventID, imgState, '.' + imgType);
+                }    
+            }
+            editEvent(user, 
+                eventID, 
+                eventName, 
+                details, 
+                attenders, 
+                times, 
+                organizers, 
+                removedAttenders, 
+                removedOrganizers, 
+                pending, 
+                removedPendings, 
+                imgType || ''
+            )
             .catch((e)=>{console.log(e)});
-        navigation.goBack();
+            
+            Promise.all([p1])
+                .then(()=>navigation.goBack());
+            
         }
     }
 
@@ -128,6 +151,7 @@ export function EventPage({ route, navigation,
         setorganizers(data.organizers);
         setPending(data.pending);
         setimgType(data.imageformat);
+
       } else {
         console.log("No such document!");
       }
@@ -206,12 +230,16 @@ export function EventPage({ route, navigation,
         setMode('time');
     };
 
-    const dateToString = (date) => {
-        return(
-            date.getDate() + '/' + (date.getMonth() + 1) + '/' + date.getFullYear() + '  ' +
-            (date.getHours() < 10 ? '0' + date.getHours() :  date.getHours()) + ':' + 
-            (date.getMinutes() < 10 ? '0' + date.getMinutes() :  date.getMinutes())
-        );
+    const addNewPhoto = async ()=>{
+        x = await DocumentPicker.getDocumentAsync({ type: 'image/*' });
+        if(x.canceled == false){
+        setimgState(x.assets[0].uri);
+        setimgType(x.assets[0].mimeType.replace('image/',''));
+        setImgChanged(true);
+        }
+        else{
+        console.log('canceled');
+        }
     }
 
     useEffect(()=>{
@@ -236,7 +264,7 @@ export function EventPage({ route, navigation,
             (error) => {
                 switch (error.code) {
                     case 'storage/object-not-found':
-                      console.log('this event not yet hv pic');
+                      //console.log('this event not yet hv pic');
                       setimgState(null);
                       break;
                 }
@@ -264,33 +292,48 @@ export function EventPage({ route, navigation,
                 is24Hour={true}
                 onChange={onChange}/>
             )}
+
+        {/* loading indicator */}
+        {!eventDoc && (
+            <View style={{
+                position:'absolute', 
+                zIndex: 2, 
+                backgroundColor:'#000000aa', 
+                height:'100%', 
+                width:"100%",
+                alignItems:'center',
+                justifyContent:'center'
+            }}
+            >
+                <MaterialIcon name="hourglass-empty" size={25} color="#fff" />
+                <Text style={{color:"#fff"}}>Loading</Text>
+            </View>
+        )}
                 
-        <ScrollView>
+        <ScrollView style={{zIndex: 1}}>
 
             <View id="image">
                 {imgState ? 
-                    <>
-                        <Image style={{height:300, width:'100%'}} source={{uri:imgState}}/>
-                    </> : 
+                    <View style={{height:300, width:'100%'}} >
+                        <Image style={{height:'100%', width:'100%'}} source={{uri:imgState}}/>
+                        <Pressable 
+                            style={{position: 'absolute', top: 20, right: 20, height: 30, width: 30,
+                                backgroundColor:'#00000044', borderRadius:20,  justifyContent:'center', alignItems:'center'}} 
+                            onPress={addNewPhoto}
+                        >
+                            <MaterialCommunityIcons name="image-edit-outline" size={20} color="#fff" />
+                        </Pressable>
+                    </View> : 
                     (!!imgType == !!eventDoc ) ? //complicated logic
                         <View style={{width:'100%', alignItems:'center', paddingTop: 20}}>
-                            <Icon name="hourglass-empty" size={25} color="#aaa" />
+                            <MaterialIcon name="hourglass-empty" size={25} color="#aaa" />
                             <Text style={{color:"#aaa"}}>Loading Image</Text>
                         </View> :
                     (
                         <Pressable style={{width:'100%', alignItems:'center', paddingTop: 20}}
-                            onPress={async ()=>{
-                                x = await DocumentPicker.getDocumentAsync({ type: 'image/*' });
-                                if(x.canceled == false){
-                                setimgState(x.assets[0].uri);
-                                setimgType(x.assets[0].mimeType.replace('image/',''));
-                                }
-                                else{
-                                console.log('canceled');
-                                }
-                            }}
+                            onPress={addNewPhoto}
                         >
-                            <Icon name="add-photo-alternate" size={25} color="#aaa" />
+                            <MaterialIcon name="add-photo-alternate" size={25} color="#aaa" />
                             <Text style={{color:"#aaa"}}>Upload Image</Text>
                         </Pressable>
                     )
@@ -364,7 +407,7 @@ export function EventPage({ route, navigation,
                                     attenders.slice(index+1)));
                         }}>
 
-                            <Icon name="close" size={17} color="#333" style={{marginTop:2, marginLeft:3}}/>
+                            <MaterialIcon name="close" size={17} color="#333" style={{marginTop:2, marginLeft:3}}/>
                         </Pressable>
 
                     </View>
@@ -387,7 +430,7 @@ export function EventPage({ route, navigation,
                                     pending.slice(index+1)))
                         }}>
 
-                            <Icon name="close" size={17} color="#333" style={{marginTop:2, marginLeft:3}}/>
+                            <MaterialIcon name="close" size={17} color="#333" style={{marginTop:2, marginLeft:3}}/>
                         </Pressable>
 
                     </View>
@@ -413,27 +456,20 @@ export function EventPage({ route, navigation,
                     setTimes={setTimes}
                 ></WeekView>
 
+                <View style={{paddingTop:15}}/>
+
                 {times.map((date, index) => {
                     //console.log(times);
                     return (
                     <View style={[{marginBottom:10}]} key={index}> 
 
                         <DateRow 
-                            date={dateToString(date.date.toDate())} 
+                            date={dateHelper.dateToString(date.date.toDate())} 
                             index={index} 
                             times={times} 
                             setTimes={setTimes}>
                         </DateRow>
                         
-                        {/* <Pressable onPress={()=>{
-                            setTimes(
-                                times.slice(0, index)
-                                .concat(
-                                    times.slice(index+1)));
-                        }}>
-
-                            <Icon name="close" size={17} color="#333" style={{marginTop:2, marginLeft:3}}/>
-                        </Pressable> */}
                     <View style={styles.seperator}/>
                     </View>
                 )})}

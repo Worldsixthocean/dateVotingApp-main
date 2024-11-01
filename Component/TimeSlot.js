@@ -34,7 +34,9 @@ export default function TimeSlot({event, index, times, setTimes, length, tableHe
                 <Text 
                     style={{color:(isAvailable ? '#FFF': '#000')}} 
                     key={index}>
-                    {event.date.getHours()}:{event.date.getMinutes()}
+                    {event.date.getHours() < 10 ? '0'+ event.date.getHours() : event.date.getHours()
+                    }:{
+                    event.date.getMinutes()< 10 ? '0'+ event.date.getMinutes() : event.date.getMinutes()}
                 </Text>
             </View>
         </Pressable>

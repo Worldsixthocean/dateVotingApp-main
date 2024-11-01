@@ -32,8 +32,8 @@ export default function Screen({ navigation, type }) {
                 </ScrollView>:
                 
                 <View style={{alignItems:'center', justifyContent:'center', height:'100%'}}>
-                    <Icon name="notifications-off" size={50} color="#333" />
-                    <Text style={{paddingTop:8}}>No notifications</Text>
+                    <Icon name="notifications-off" size={50} color="#777" />
+                    <Text style={{paddingTop:8, color:'#777'}}>No notifications</Text>
                 </View>
             }
         </View>

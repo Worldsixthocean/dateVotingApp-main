@@ -1,4 +1,4 @@
-import { collection, doc, addDoc, updateDoc, arrayUnion,arrayRemove, getDoc } from 'firebase/firestore';
+import { collection, doc, addDoc, updateDoc, arrayUnion,arrayRemove, getDoc, Timestamp } from 'firebase/firestore';
 import { db} from '../ContextAndConfig/firebaseConfig.js'
 
 export async function addPendingToUser(invite, uid, eventID){
@@ -56,4 +56,11 @@ export async function fetchUser(id){
     } else {
       console.log("No such document!");
     }
+}
+
+export async function lastUpdateTime(uid){
+    const userDocRef = doc(db, "users", uid);
+    await updateDoc(userDocRef, {
+        lastEventUpdateTime: Timestamp.now()
+    });
 }

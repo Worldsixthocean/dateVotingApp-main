@@ -18,8 +18,6 @@ import * as DocumentPicker from 'expo-document-picker';
 import HomeScreenCard from '../Component/HomeScreenCard.js';
 
 function HomeScreen({ navigation }) {
-
-  const [imgState, setimgState] = useState();
   
   const insets = useSafeAreaInsets();
   const headerHeight = useHeaderHeight();
@@ -42,21 +40,7 @@ function HomeScreen({ navigation }) {
       headerTintColor: '#fff'
     });
   });
-
-  React.useEffect(() => {
-    const func = async() => {
-      const imgReference = ref(storage, 'Coffee.png');
-      await getDownloadURL(imgReference).then((x)=>{
-        setimgState(x);
-      });
-    }
-    
-    if (imgState == undefined){
-      func();
-    }
-
-  },[]);
-
+  
   return (
     <View>
       <View id="full_screen" style={{height:'100%', width:'100%'}}>
@@ -95,40 +79,6 @@ function HomeScreen({ navigation }) {
         }}>
 
             <View style={{marginVertical:5}}/>
-
-            {/* <Button title={'Doc Pick upload'}
-              onPress={async ()=>{
-                x = await DocumentPicker.getDocumentAsync({ type: 'image/*' });
-                if(x.canceled == false){
-                  const response = await fetch(x.assets[0].uri);
-                  const blob = await response.blob();
-                  const mountainsRef = ref(storage, 'mountains.jpg');
-                  uploadBytes(mountainsRef, blob).then((snapshot) => {
-                    console.log('Uploaded a blob or file!');
-                  });
-                }
-                else{
-                  console.log(x.canceled);
-                }
-            }}/>
-
-            <View style={{marginVertical:5}}/>
-
-            <Button title={'Doc Pick local'}
-              onPress={async ()=>{
-                x = await DocumentPicker.getDocumentAsync({ type: 'image/*' });
-                if(x.canceled == false){
-                  setimgState(x.assets[0].uri);
-                }
-                else{
-                  console.log(x.canceled);
-                }
-            }}/>
-          <View style={{height:250, width:'100%', marginTop:50}}>
-            <ScrollView scrollEnabled={false}>
-              <Image style={{height:300, width:'100%'}}source={{uri:imgState}}/>
-            </ScrollView>
-          </View> */}
         </View>
       </View>
     </View>

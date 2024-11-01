@@ -1,7 +1,8 @@
 import { collection, doc, addDoc, updateDoc, arrayUnion, getDoc } from 'firebase/firestore';
 import { ref, uploadBytes  } from 'firebase/storage';
 import { db, events, users, storage } from '../ContextAndConfig/firebaseConfig.js';
-import {addOrganizeToUser, addAttendeesToUser, removeOrganizeToUser, removeAttendeesToUser, addPendingToUser, fetchUser, removePendingToUser} from './user.js';
+import {addOrganizeToUser, addAttendeesToUser, removeOrganizeToUser, removeAttendeesToUser, 
+  addPendingToUser, fetchUser, removePendingToUser, lastUpdateTime} from './user.js';
 
 
 export async function addEvent(user, name, details, attendees, dates, organizers, pending){
@@ -32,8 +33,10 @@ export async function uploadEventPic(eventID, uri, type){
   const response = await fetch(uri);
   const blob = await response.blob();
   const picRef = ref(storage, 'event/' + eventID + type);
+  return new Promise((resolve) => {
   uploadBytes(picRef, blob).then((snapshot) => {
     console.log('Uploaded a blob or file!');
+  }).then(()=>resolve());
   });
 }
 
@@ -71,6 +74,11 @@ export async function editEvent(user, eventID, name, details, attendees, dates, 
       });
       organizers.forEach(async(organizer) => {
         addOrganizeToUser(organizer.uid, eventID)
+          .catch((e)=>{console.log(e)});
+      });
+
+      attendees.forEach(async(attendee) => {
+        lastUpdateTime(attendee.uid, eventID)
           .catch((e)=>{console.log(e)});
       });
 
