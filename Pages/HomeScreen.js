@@ -1,23 +1,19 @@
 import * as React from 'react';
 import { useContext, useState } from 'react';
-import { View, Text, Button, Image, ScrollView } from 'react-native';
+import { View,Text,Button, Alert } from 'react-native';
 import { useHeaderHeight } from '@react-navigation/elements';
 
 import { LinearGradient } from 'expo-linear-gradient';
 
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { storage } from '../ContextAndConfig/firebaseConfig.js';
 import { UserContext } from '../ContextAndConfig/UserContext.js';
+
+import HomeScreenCard from '../Component/HomeScreenCard.js';
 import PendingBox from '../Component/PendingBox.js'
 import importStyle from '../style.js';
 
-import { getDownloadURL, ref, uploadBytes  } from 'firebase/storage';
-
-import * as DocumentPicker from 'expo-document-picker';
-import HomeScreenCard from '../Component/HomeScreenCard.js';
-
-function HomeScreen({ navigation }) {
+function HomeScreen({ navigation, alert, setAlert }) {
   
   const insets = useSafeAreaInsets();
   const headerHeight = useHeaderHeight();
@@ -42,8 +38,8 @@ function HomeScreen({ navigation }) {
   });
   
   return (
-    <View>
       <View id="full_screen" style={{height:'100%', width:'100%'}}>
+
         <View id="top_area" style={{
             height:"40%"
         }}>
@@ -79,9 +75,18 @@ function HomeScreen({ navigation }) {
         }}>
 
             <View style={{marginVertical:5}}/>
+            <Button title="Alert" onPress={()=>
+              Alert.alert('Alert Title', 'My Alert Msg', [
+                {
+                  text: 'Cancel',
+                  onPress: () => console.log('Cancel Pressed'),
+                  style: 'cancel',
+                },
+                {text: 'OK', onPress: () => console.log('OK Pressed')},
+              ])
+            }/>
         </View>
       </View>
-    </View>
   );
 }
 

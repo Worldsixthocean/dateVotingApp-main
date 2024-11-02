@@ -1,14 +1,14 @@
 
 import { View, Text, Pressable, ScrollView } from 'react-native';
-import * as dateHelper from '../DataClass/dateHelper.js'
+import * as dateHelper from '../../../DataClass/dateHelper.js'
 import WeekDayView from './WeekdayView.js';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import TimeRow from './TimeRow.js';
 
 //import { toDate } from 'firebase/firestore'; 
 
-import { sameDateOrEariler } from '../DataClass/dateHelper.js';
-import { leadingZeros } from '../Utils/type.js';
+import { sameDateOrEariler } from '../../../DataClass/dateHelper.js';
+import { leadingZeros } from '../../../Utils/type.js';
 import TimeSlot from './TimeSlot.js';
 
 export default function WeekView({date = new Date(), events = [], Duration = 15, onNextWeek = ()=>{}, onLastWeek = ()=>{}, setTimes = ()=>{}}){

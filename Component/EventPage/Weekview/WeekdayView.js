@@ -1,5 +1,5 @@
 import { View, Text, Button, Pressable } from 'react-native';
-import * as dateHelper from '../DataClass/dateHelper.js'
+import * as dateHelper from '../../../DataClass/dateHelper.js'
 
 export default function WeekDayView({date, style}){
 return(

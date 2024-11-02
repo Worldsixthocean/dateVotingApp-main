@@ -16,7 +16,6 @@ import EventScreen from './Pages/EventScreen.js';
 import DrawerContent from './Component/DrawerContent.js';
 import LoginScreen from './Pages/Login.js';
 import NotiScreen from './Pages/Noti.js'
-import TestScreen from './Pages/TestPage.js';
 import useAuth from './ContextAndConfig/AuthContext.js';
 import {db} from './ContextAndConfig/firebaseConfig.js';
 
@@ -86,7 +85,7 @@ function App() {
             <Drawer.Navigator initialRouteName="Home" backBehavior='initialRoute'
               drawerContent={(props) => <DrawerContent{...props}/>}>
 
-              <Drawer.Screen name="Home" component={HomeScreen} />
+              <Drawer.Screen name="Home" component={HomeScreen}/>
 
               <Drawer.Screen 
                 name="Events" 
@@ -109,7 +108,7 @@ function App() {
     return (
       <SafeAreaProvider>
         <NavigationContainer>
-          <Drawer.Navigator 
+          <Drawer.Navigator id='Drawer.Navigator'
             initialRouteName="Login" 
             backBehavior='initialRoute'  
             screenOptions={{

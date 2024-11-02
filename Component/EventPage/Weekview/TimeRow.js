@@ -1,6 +1,6 @@
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { View, Text, Button, Pressable } from 'react-native';
-import styles from '../style.js';
+import styles from '../../../style.js';
 
 export default function TimeRow({style = {}}){
 return(

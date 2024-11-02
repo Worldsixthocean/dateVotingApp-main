@@ -12,7 +12,7 @@ import { UserContext } from '../ContextAndConfig/UserContext.js';
 import SearchUserPage from './Search.js';
 import styles from '../style.js';
 import {addEvent} from '../DataClass/event.js'
-import { Namebox } from '../Component/NameBox.js';
+import { NewEventNamebox } from '../Component/NewEventNamebox.js';
 
 const Stack = createNativeStackNavigator();
 
@@ -220,10 +220,10 @@ export function NewEventPage({ navigation, attenders, setAttenders, organizers, 
 
             <View id='attendees' style={[styles.outlineButtonCluster,{marginBottom:30}]}>
                 {attenders.map((attendees, index) => (
-                    <Namebox attendees={attendees} index={index} list={attenders} setList={setAttenders} key={index}></Namebox>
+                    <NewEventNamebox attendees={attendees} index={index} list={attenders} setList={setAttenders} key={index}></NewEventNamebox>
                 ))}
                 {pending.map((pendingUser, index) => (
-                    <Namebox attendees={pendingUser} index={index} list={pending} setList={setPending} key={index} note={'(Pending)'}></Namebox>
+                    <NewEventNamebox attendees={pendingUser} index={index} list={pending} setList={setPending} key={index} note={'(Pending)'}></NewEventNamebox>
                 ))}
                 
                 <Pressable 

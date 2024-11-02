@@ -56,6 +56,7 @@ function Screen({ navigation,
             paddingLeft: 18,
             paddingRight: 18
       }}>
+        <Text style={{marginLeft:4,marginBottom:7,color:'#666'}}>Invitaion will be sent after changes is saved.</Text>
 
         <View style={[importStyle.inputBox,{marginBottom:18}]}>
           <TextInput 

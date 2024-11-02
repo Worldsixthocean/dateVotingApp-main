@@ -1,13 +1,13 @@
 import * as React from 'react';
 import { useContext } from 'react';
-import { View, Text, Pressable } from 'react-native';
+import { View, Text, Pressable, Alert } from 'react-native';
 
-import { UserContext } from '../ContextAndConfig/UserContext';
+import { UserContext } from '../../ContextAndConfig/UserContext.js';
 
-import {userInList} from '../DataClass/event.js'
-import TristateCheckBox from '../Component/tristate_checkBox.js';
+import {userInList} from '../../DataClass/event.js'
+import TristateCheckBox from '../tristate_checkBox.js';
 
-import { eventPageToggle } from '../Utils/eventPageToggle.js'
+import { eventPageToggle } from '../../Utils/eventPageToggle.js'
 
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
@@ -35,11 +35,16 @@ function DateRow( {date, index, times, setTimes} ) {
                     <Text style={{fontWeight:500, fontSize:16, paddingBottom:1}}>{date}</Text>
                 </View>
                 <Pressable className='right' onPress={()=>{
-                        setTimes(
-                            times.slice(0, index)
-                            .concat(
-                                times.slice(index+1)));
-                    }}>
+                    Alert.alert('Delete proposed time?', 'All the votes on this date will be deleted.', [
+                        {text: 'Cancel',onPress: () => {},style: 'cancel'},
+                        {text: 'OK', onPress: () => 
+                            setTimes(
+                                times.slice(0, index).concat(times.slice(index+1))
+                            )
+                        },
+                    ])
+
+                }}>
 
                     <Icon name="close" size={23} color="#333"/>
                 </Pressable>

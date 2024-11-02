@@ -97,7 +97,6 @@ function RegisterScreen({ navigation, type }) {
   },[]);
 
   return (
-    <View>
       <View id="full_screen" style={{height:'100%', width:'100%'}}>
         <View id="top_area" style={{
             // paddingTop: headerHeight + 3,
@@ -235,7 +234,6 @@ function RegisterScreen({ navigation, type }) {
           
         </View>
       </View>
-    </View>
   );
 }
 

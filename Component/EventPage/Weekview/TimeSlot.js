@@ -1,8 +1,8 @@
 import { View, Text, Pressable } from 'react-native';
 import { useContext } from 'react';
-import { UserContext } from '../ContextAndConfig/UserContext';
-import { userInList } from '../DataClass/event.js'
-import { eventPageToggle } from '../Utils/eventPageToggle.js'
+import { UserContext } from '../../../ContextAndConfig/UserContext.js';
+import { userInList } from '../../../DataClass/event.js'
+import { eventPageToggle } from '../../../Utils/eventPageToggle.js'
 
 export default function TimeSlot({event, index, times, setTimes, length, tableHeight}){
 

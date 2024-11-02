@@ -18,8 +18,10 @@ function Drawer( props ) {
     const user = useContext(UserContext);
     const insets = useSafeAreaInsets();
 
+    drawerTopPadding = insets.top > 5 ? insets.top : 5;
+
     return(
-            <View style={{paddingTop: insets.top, height:'100%'}}>
+            <View style={{paddingTop: drawerTopPadding, height:'100%'}}>
                 <DrawerItemList {...props} />
                 <View style={{flex:1}}></View>
                 <View style={{flexDirection:'row', paddingStart:20, paddingBottom:30, paddingEnd:7, alignItems:'center'}}>

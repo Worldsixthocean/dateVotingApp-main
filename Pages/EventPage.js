@@ -19,11 +19,13 @@ import { UserContext } from '../ContextAndConfig/UserContext.js';
 import SearchUserPage from './Search.js';
 import styles from '../style.js';
 import {userInList, editEvent, uploadEventPic} from '../DataClass/event.js'
-import DateRow from '../Component/DateRow.js';
-import WeekView from '../Component/WeekView.js';
+import DateRow from '../Component/EventPage/DateRow.js';
+import WeekView from '../Component/EventPage/Weekview/WeekView.js';
 import * as dateHelper from '../DataClass/dateHelper.js'
 
 import * as DocumentPicker from 'expo-document-picker';
+import AttendeesNamebox from '../Component/EventPage/AttendeesNameBox.js';
+import PendingNameBox from '../Component/EventPage/PendingNameBox.js';
 
 const Stack = createNativeStackNavigator();
 
@@ -379,61 +381,21 @@ export function EventPage({ route, navigation,
 
             <View id='attendees' style={[styles.outlineButtonCluster,{marginBottom:10}]}>
                 {attenders.map((attendees, index) => (
-                    <View id='attendees_name' style={[styles.outlineButton,{marginBottom:10}]} key={index}> 
-                        
-                        <Text style={{}}> 
-                            {attendees.name || attendees.email}
-                        </Text>
-                        
-                        <Pressable onPress={()=>{
-                            //removedAttenders: just storing the userID
-                            if(!removedAttenders.includes(attendees.uid)){
-                                setRemovedAttenders(removedAttenders.concat([attendees.uid]));
-                            }
-
-                            setTimes(
-                                times.map((e)=>({
-                                    date: e.date, 
-                                    available: 
-                                        e.available.filter((e)=>(
-                                            e.uid != attendees.uid)
-                                        )
-                                }))
-                            );
-
-                            setAttenders(
-                                attenders.slice(0, index)
-                                .concat(
-                                    attenders.slice(index+1)));
-                        }}>
-
-                            <MaterialIcon name="close" size={17} color="#333" style={{marginTop:2, marginLeft:3}}/>
-                        </Pressable>
-
-                    </View>
+                    <AttendeesNamebox
+                        currentAttendee={attendees} index={index}
+                        removedAttenders={removedAttenders} setRemovedAttenders={setRemovedAttenders}
+                        times={times} setTimes={setTimes}
+                        attendersList={attenders} setAttendersList={setAttenders}
+                        key={index}
+                    />
                 ))}
+
                 {pending.map((pendingUser, index) => (
-                    <View id='pending_name' style={[styles.outlineButton,{marginBottom:10}]} key={index}> 
-        
-                        <Text style={{}}> 
-                            {pendingUser.name || pendingUser.email} (pending)
-                        </Text>
-                        
-                        <Pressable onPress={()=>{
-                            //removedPendings: just storing the userID
-                            if(!removedPendings.includes(pendingUser.uid)){
-                                setRemovedPendings(removedPendings.concat([pendingUser.uid]));}
-
-                            setPending(
-                                pending.slice(0, index)
-                                .concat(
-                                    pending.slice(index+1)))
-                        }}>
-
-                            <MaterialIcon name="close" size={17} color="#333" style={{marginTop:2, marginLeft:3}}/>
-                        </Pressable>
-
-                    </View>
+                    <PendingNameBox 
+                        currentPending={pendingUser} index={index} 
+                        removedPendings={removedPendings} setRemovedPendings={setRemovedPendings}
+                        pendingList={pending} setPendingList={setPending}
+                    />
                 ))}
                 
                 <Pressable 
@@ -454,7 +416,7 @@ export function EventPage({ route, navigation,
                     onLastWeek={()=>{setShownDate(dateHelper.daysBefore(shownDate,7))}}
                     events={times}
                     setTimes={setTimes}
-                ></WeekView>
+                />
 
                 <View style={{paddingTop:15}}/>
 
@@ -483,6 +445,11 @@ export function EventPage({ route, navigation,
                     </Text>
                 </Pressable>
             </View>
+
+            {isOrganizer && <View id='Event_options' style={[{marginBottom:30}]}>
+                <Text style={styles.sectionTitle}>Event Options</Text>
+
+            </View>}
 
             <View style={{alignItems:'flex-start'}}>
                 <Pressable 
