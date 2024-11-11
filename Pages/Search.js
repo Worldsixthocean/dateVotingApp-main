@@ -1,21 +1,124 @@
 import * as React from 'react';
 import { useState, useEffect, useContext } from 'react';
-import { View, Text, Pressable, TextInput} from 'react-native';
+import { View, Text, Pressable, TextInput, Animated, TouchableOpacity} from 'react-native';
 
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
-import { collection, query, where, getDocs, or } from "firebase/firestore";
+import { collection, query, where, getDocs, or, doc, getDoc } from "firebase/firestore";
 import {db} from '../ContextAndConfig/firebaseConfig.js';
 import { UserContext } from '../ContextAndConfig/UserContext.js';
 
 import importStyle from '../style.js'
 
-function Screen({ navigation, 
+import { DefaultTheme } from '@react-navigation/native';
+import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
+
+import * as Clipboard from 'expo-clipboard';
+
+const Tab = createMaterialTopTabNavigator();
+
+//https://reactnavigation.org/docs/6.x/material-top-tab-navigator#tabbar
+function MyTabBar({ state, navigation }) {
+  return (
+    <View style={{ flexDirection: 'row', height:50 }}>
+      {state.routes.map((route, index) => {
+        const label = route.name;
+        const isFocused = state.index === index;
+        const onPress = () => {
+            navigation.navigate(route.name, route.params);
+        };
+
+        return (
+          <Pressable key={index}
+            onPress={onPress}
+            style={{ flex: 1, 
+              backgroundColor:isFocused ? '#f8f8f8' : '#fafafa', 
+              borderBottomColor: isFocused ? DefaultTheme.colors.primary : '#ddd',
+              borderBottomWidth:4,
+              alignItems:'center',
+              justifyContent:'center'
+            }}
+          >
+            <Text style={{color: isFocused ? DefaultTheme.colors.primary : '#777'}}>
+              {label}
+            </Text>
+          </Pressable>
+        );
+      })}
+    </View>
+  );
+}
+
+function Screen({route, navigation, 
   attenders, setAttenders, 
   pending, setPending,
-  organizers, setorganizers
+  organizers, setorganizers,
+  removedAttenders, setRemovedAttenders
+}) {
+  return (
+    <Tab.Navigator tabBar={props => <MyTabBar {...props} />}>
+      <Tab.Screen name="Join by invitation">
+        {(props) => <Search {...props} 
+                              attenders={attenders} 
+                              setAttenders={setAttenders} 
+                              organizers={organizers} 
+                              setorganizers={setorganizers}
+                              removedAttenders={removedAttenders}
+                              setRemovedAttenders={setRemovedAttenders}
+                              pending={pending}
+                              setPending={setPending}/>}
+      </Tab.Screen>
+      <Tab.Screen name="Join by Code">
+        {(props) => <MessagesScreen eventID={route.params.eventID} newEvent={route.params.newEvent}/>}
+        </Tab.Screen>
+    </Tab.Navigator>
+  );
+}
+
+function MessagesScreen({eventID, newEvent}) {
+  const [enableCode, setEnableCode] = useState(false);
+  useEffect( ()=>  {
+    if (eventID){
+    async function fetchJoinViaCode(){
+    const docRef = doc(db, "events", eventID);
+    const docSnap = await getDoc(docRef);
+    if (docSnap.exists()) {
+      let data = docSnap.data();
+      setEnableCode(data.eventOption.joinViaCode);
+    } else {
+      console.log("No such document!");
+    }}
+    fetchJoinViaCode();}
+})
+  return (
+    <View style={{ flex: 1, padding:30, alignItems:'center' }}>
+      {enableCode ? <>
+        <Text style={{fontWeight:500, fontSize:22, marginBottom:15}}>Join Via Code</Text>
+        <Text style={{marginBottom:5}}>Enter this code in 'Join Event' to add attendees:</Text>
+        <Pressable 
+          style={{ backgroundColor:"#dfdfdf", padding:10, borderRadius:13, width:'100%',
+            flexDirection:'row', alignItems:'center'}}
+          onPress={ async()=>{await Clipboard.setStringAsync(eventID)}}>
+          <Text style={{fontWeight:500, fontSize:17, flex:1, textAlign:'center'}}>{eventID}</Text>
+          <Icon name="content-copy" size={20} color="#888"/>
+        </Pressable>
+      </>
+      : newEvent ? 
+      <Text style={{color:'#777'}}>You can enable join by code after creating a new event.</Text>
+      : 
+      <Text style={{color:'#777'}}>You need to enable 'Joining via code' and save the event in order to join by code.</Text>}
+    </View>
+  );
+}
+
+
+function Search({ navigation, 
+  attenders, setAttenders, 
+  pending, setPending,
+  organizers, setorganizers,
+  removedAttenders, setRemovedAttenders
 }) {
 
   const user = useContext(UserContext);

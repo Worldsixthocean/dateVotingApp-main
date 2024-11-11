@@ -228,7 +228,7 @@ export function NewEventPage({ navigation, attenders, setAttenders, organizers, 
                 
                 <Pressable 
                     style={styles.outlineButton} 
-                    onPress={()=>{ navigation.navigate('Search User') }}>
+                    onPress={()=>{ navigation.navigate('Search User',{eventID:'', newEvent:true}) }}>
                     <Text style={{}}>
                         + Add attendees
                     </Text>

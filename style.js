@@ -86,4 +86,7 @@ export default styles = StyleSheet.create({
       width: 36,
       height: 36
     },
+    rowAlignCenter: {
+      flexDirection:'row', alignItems:'center'
+    }
   });

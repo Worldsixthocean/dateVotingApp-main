@@ -11,6 +11,8 @@ import { signOut } from 'firebase/auth';
 import default_avatar from '../assets/default_avatar.png';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
+import logo from '../assets/logo.png'
+
 import styles from '../style.js';
 
 function Drawer( props ) {
@@ -22,6 +24,7 @@ function Drawer( props ) {
 
     return(
             <View style={{paddingTop: drawerTopPadding, height:'100%'}}>
+                <Image source={logo} style={{margin:15, height:100,width:200, resizeMode:'contain'}}></Image>
                 <DrawerItemList {...props} />
                 <View style={{flex:1}}></View>
                 <View style={{flexDirection:'row', paddingStart:20, paddingBottom:30, paddingEnd:7, alignItems:'center'}}>

@@ -5,7 +5,9 @@ export default function AttendeesNamebox({
     currentAttendee, index,
     removedAttenders, setRemovedAttenders, 
     times, setTimes,
-    attendersList, setAttendersList}){
+    attendersList, setAttendersList,
+    showClose
+}){
     const deleteAttendees = ()=>{
         //removedAttenders: just storing the userID
         if(!removedAttenders.includes(currentAttendee.uid)){
@@ -34,12 +36,14 @@ export default function AttendeesNamebox({
     return(
         <Chip 
             content={currentAttendee.name || currentAttendee.email} 
-            onPressCloseButton={()=>{
-                Alert.alert('Delete Attendee?', 'All the proposed date he/she voted will be deleted.', [
-                    {text: 'Cancel', onPress: () => {}, style: 'cancel'},
-                    {text: 'OK', onPress: deleteAttendees},
-                ]) 
-            }}
+            onPressCloseButton={
+                showClose ? 
+                    ()=>{
+                    Alert.alert('Delete Attendee?', 'All the proposed date he/she voted will be deleted.', [
+                        {text: 'Cancel', onPress: () => {}, style: 'cancel'},
+                        {text: 'OK', onPress: deleteAttendees},
+                    ])}
+                : null}
         />
     )
 }

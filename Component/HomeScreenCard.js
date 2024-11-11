@@ -19,7 +19,11 @@ export default function HomeScreenCard({ }) {
                 <Text style={homeScreenCardStyles.iconColumnText}>New Event</Text>
             </Pressable>
             <Pressable style={homeScreenCardStyles.iconColumn}>
-                <Icon name="playlist-add" size={50} color="#333"/>
+                <Icon name="playlist-add" size={50} color="#333"
+                onPress={()=>{
+                    RootNavigation.navigate('Join')
+                }}
+                />
                 <Text style={homeScreenCardStyles.iconColumnText}>Join Event</Text>
             </Pressable>
             <Pressable style={homeScreenCardStyles.iconColumn}>

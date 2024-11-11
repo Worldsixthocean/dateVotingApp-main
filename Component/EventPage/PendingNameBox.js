@@ -4,7 +4,8 @@ import { Alert } from 'react-native';
 export default function PendingNameBox({
     currentPending, index, 
     removedPendings, setRemovedPendings,
-    pendingList, setPendingList
+    pendingList, setPendingList,
+    showClose
 }){
     const deletePending = ()=>{
         //removedPendings: just storing the userID
@@ -19,12 +20,16 @@ export default function PendingNameBox({
     return(
         <Chip 
             content={(currentPending.name || currentPending.email) + ' (Pending)'} 
-            onPressCloseButton={()=>{
-                    Alert.alert('Cancel invitation?', 'Do you want to cancel the event invitaion?', [
-                        {text: 'Cancel', onPress: () => {}, style: 'cancel'},
-                        {text: 'OK', onPress: deletePending},
-                    ])
-            }}
+            onPressCloseButton={
+                showClose ?
+                    ()=>{
+                        Alert.alert('Cancel invitation?', 'Do you want to cancel the event invitaion?', [
+                            {text: 'Cancel', onPress: () => {}, style: 'cancel'},
+                            {text: 'OK', onPress: deletePending},
+                        ])
+                    }
+                    : null
+            }
         />
     )
 }

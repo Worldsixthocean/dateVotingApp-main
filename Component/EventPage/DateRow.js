@@ -12,7 +12,7 @@ import { eventPageToggle } from '../../Utils/eventPageToggle.js'
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
 //A list of propose date for ppl to vote
-function DateRow( {date, index, times, setTimes} ) {
+function DateRow( {date, index, times, setTimes, showClose} ) {
 
     const user = useContext(UserContext);
 
@@ -24,17 +24,18 @@ function DateRow( {date, index, times, setTimes} ) {
     return (
         <>
             <View style={{flexDirection:'row', alignItems:'center', paddingBottom:8, paddingTop:3, justifyContent:'space-between'}}>
-                <View className='left' style={{flexDirection:'row', alignItems:'center'}}>
+                <Pressable className='left' style={{flexDirection:'row', alignItems:'center'}}
+                    onPress={()=>{toggle(!isAvailable && !isMaybe, true)}}
+                    onLongPress={()=>{toggle(!isAvailable && !isMaybe, false)}}>
                     <TristateCheckBox
                         style={{alignSelf:'flex-start', paddingRight: 5}} color='#0065FF'
-                        onPress={()=>{toggle(!isAvailable && !isMaybe, true)}}
-                        onLongPress={()=>{toggle(!isAvailable && !isMaybe, false)}}
                         check={isAvailable}
                         indeterminate={isMaybe}
                     />
                     <Text style={{fontWeight:500, fontSize:16, paddingBottom:1}}>{date}</Text>
-                </View>
-                <Pressable className='right' onPress={()=>{
+                </Pressable>
+                
+                {showClose && <Pressable className='right' onPress={()=>{
                     Alert.alert('Delete proposed time?', 'All the votes on this date will be deleted.', [
                         {text: 'Cancel',onPress: () => {},style: 'cancel'},
                         {text: 'OK', onPress: () => 
@@ -47,7 +48,7 @@ function DateRow( {date, index, times, setTimes} ) {
                 }}>
 
                     <Icon name="close" size={23} color="#333"/>
-                </Pressable>
+                </Pressable>}
             </View>
 
             <View id="show_voted" style={{paddingLeft:3}}>

@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { useState, useContext, useEffect } from 'react';
-import { View, Text, Pressable, TextInput, FlatList, ScrollView, Image} from 'react-native';
+import { View, Text, Pressable, TextInput, ScrollView, Image, Alert} from 'react-native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -18,7 +18,7 @@ import { getDownloadURL, ref, uploadBytes  } from 'firebase/storage';
 import { UserContext } from '../ContextAndConfig/UserContext.js';
 import SearchUserPage from './Search.js';
 import styles from '../style.js';
-import {userInList, editEvent, uploadEventPic} from '../DataClass/event.js'
+import {userInList, editEvent, uploadEventPic, deleteEvent} from '../DataClass/event.js'
 import DateRow from '../Component/EventPage/DateRow.js';
 import WeekView from '../Component/EventPage/Weekview/WeekView.js';
 import * as dateHelper from '../DataClass/dateHelper.js'
@@ -26,10 +26,11 @@ import * as dateHelper from '../DataClass/dateHelper.js'
 import * as DocumentPicker from 'expo-document-picker';
 import AttendeesNamebox from '../Component/EventPage/AttendeesNameBox.js';
 import PendingNameBox from '../Component/EventPage/PendingNameBox.js';
+import TristateCheckBox from '../Component/tristate_checkBox.js';
 
 const Stack = createNativeStackNavigator();
 
-export default function Screen({ navigation }) {
+export default function Screen({route, navigation }) {
 
     const user = useContext(UserContext);
 
@@ -41,6 +42,15 @@ export default function Screen({ navigation }) {
     const [removedAttenders, setRemovedAttenders] = useState([]);
     const [removedOrganizers, setRemovedOrganizers] = useState([]);
     const [removedPendings, setRemovedPendings] = useState([]);
+
+    const [eventOption, setEventOption] = useState({
+        allowAddAttendees: false,
+        allowRemoveAttendees: false,
+        allowAddTime: false,
+        allowRemoveTime: false,
+        joinViaCode: false,
+        joinViaEmail: false
+    });
 
     return(
     <Stack.Navigator initialRouteName="Event page"
@@ -58,7 +68,9 @@ export default function Screen({ navigation }) {
                             removedPendings={removedPendings} 
                             setRemovedPendings={setRemovedPendings}
                             pending={pending}
-                            setPending={setPending}/>}
+                            setPending={setPending}
+                            eventOption={eventOption}
+                            setEventOption={setEventOption}/>}
         </Stack.Screen>
         <Stack.Screen name="Search User">
             {(props) => <SearchUserPage {...props} 
@@ -81,7 +93,8 @@ export function EventPage({ route, navigation,
     removedAttenders, setRemovedAttenders,
     removedOrganizers, setRemovedOrganizers,
     removedPendings, setRemovedPendings,
-    pending, setPending}) {
+    pending, setPending, 
+    eventOption, setEventOption}) {
 
     const user = useContext(UserContext);
     
@@ -127,7 +140,8 @@ export function EventPage({ route, navigation,
                 removedOrganizers, 
                 pending, 
                 removedPendings, 
-                imgType || ''
+                imgType || '',
+                eventOption
             )
             .catch((e)=>{console.log(e)});
             
@@ -136,8 +150,18 @@ export function EventPage({ route, navigation,
             
         }
     }
-
+    
     const { eventID } = route.params;
+
+    const handleDelete = async ()=> {
+        Alert.alert('Delete Event', 'All the votes on this date will be deleted.', [
+            {text: 'Cancel',onPress: () => {},style: 'cancel'},
+            {text: 'OK', onPress: () => {
+                navigation.goBack();
+                deleteEvent(eventID,attenders,organizers,pending,removedAttenders,removedOrganizers,removedPendings);
+            }},
+        ])
+    }
 
     //get by event id
     const fetchEvent = async (docRef) => {
@@ -153,6 +177,7 @@ export function EventPage({ route, navigation,
         setorganizers(data.organizers);
         setPending(data.pending);
         setimgType(data.imageformat);
+        setEventOption(data.eventOption);
 
       } else {
         console.log("No such document!");
@@ -185,6 +210,7 @@ export function EventPage({ route, navigation,
             setorganizers(data.organizers);
             setPending(data.pending);
             setimgType(data.imageformat);
+            setEventOption(data.eventOption);
           } else {
             console.log("No such document!");     
         }});
@@ -197,7 +223,7 @@ export function EventPage({ route, navigation,
 
     
     const isOrganizer = userInList(eventDoc?.organizers ,user.uid);
-    //console.log(isOrganizer);
+    //console.log(eventOption);
 
     //set the new proposed date and add it to the list of proposed time
     const onChange = (event, selectedDate) => {
@@ -253,7 +279,7 @@ export function EventPage({ route, navigation,
         }
     })
 
-    //console.log(removedOrganizers);
+    //console.log(imgType);
 
     //find image after getting doc
     useEffect(() => {
@@ -386,6 +412,7 @@ export function EventPage({ route, navigation,
                         removedAttenders={removedAttenders} setRemovedAttenders={setRemovedAttenders}
                         times={times} setTimes={setTimes}
                         attendersList={attenders} setAttendersList={setAttenders}
+                        showClose={isOrganizer || eventOption.allowRemoveAttendees}
                         key={index}
                     />
                 ))}
@@ -395,16 +422,17 @@ export function EventPage({ route, navigation,
                         currentPending={pendingUser} index={index} 
                         removedPendings={removedPendings} setRemovedPendings={setRemovedPendings}
                         pendingList={pending} setPendingList={setPending}
+                        showClose={isOrganizer || eventOption.allowRemoveAttendees} key={index}
                     />
                 ))}
                 
-                <Pressable 
+                {(isOrganizer || eventOption.allowAddAttendees) && <Pressable 
                     style={styles.outlineButton} 
-                    onPress={()=>{ navigation.navigate('Search User') }}>
+                    onPress={()=>{ navigation.navigate('Search User',{eventID: eventID })}}>
                     <Text style={{}}>
                         + Add attendees
                     </Text>
-                </Pressable>
+                </Pressable>}
             </View>
 
             <Text style={styles.sectionTitle}>Dates</Text>
@@ -429,29 +457,71 @@ export function EventPage({ route, navigation,
                             date={dateHelper.dateToString(date.date.toDate())} 
                             index={index} 
                             times={times} 
-                            setTimes={setTimes}>
+                            setTimes={setTimes}
+                            showClose={isOrganizer || eventOption.allowRemoveTime}>
                         </DateRow>
                         
                     <View style={styles.seperator}/>
                     </View>
                 )})}
 
-                <Pressable 
+                {(isOrganizer||eventOption.allowAddTime) && <Pressable 
                     style={styles.outlineButton}
                     onPress={()=>{showDatepicker()}}
                 >
                     <Text style={[]}>
                         + Propose new date
                     </Text>
-                </Pressable>
+                </Pressable>}
             </View>
 
             {isOrganizer && <View id='Event_options' style={[{marginBottom:30}]}>
                 <Text style={styles.sectionTitle}>Event Options</Text>
+                <Text style={{marginBottom:4}}>Allow non-organizers to:</Text>
 
+                <View style={[styles.rowAlignCenter,{marginBottom:5}]}>
+
+                    <Pressable style={styles.rowAlignCenter}
+                        onPress={()=>setEventOption({...eventOption, allowAddAttendees: !eventOption.allowAddAttendees})}>
+                        <TristateCheckBox color='#0065FF' check={eventOption.allowAddAttendees}/>
+                        <Text style={{fontWeight:500, paddingHorizontal:5}}>Add</Text>
+                    </Pressable>
+
+                    <Pressable style={styles.rowAlignCenter}
+                        onPress={()=>setEventOption({...eventOption, allowRemoveAttendees: !eventOption.allowRemoveAttendees})}>
+                        <TristateCheckBox color='#0065FF' check={eventOption.allowRemoveAttendees}/>
+                        <Text style={{fontWeight:500, paddingLeft:5}}>Remove</Text>
+                    </Pressable>
+
+                    <Text> other attendees</Text>
+
+                </View>
+
+                <View style={[styles.rowAlignCenter,{marginBottom:9}]}>
+
+                    <Pressable style={styles.rowAlignCenter}
+                        onPress={()=>setEventOption({...eventOption, allowAddTime: !eventOption.allowAddTime})}> 
+                        <TristateCheckBox color='#0065FF' check={eventOption.allowAddTime}/>
+                        <Text style={{fontWeight:500, paddingHorizontal:5}}>Add</Text>
+                    </Pressable>
+
+                    <Pressable style={styles.rowAlignCenter}
+                        onPress={()=>setEventOption({...eventOption, allowRemoveTime: !eventOption.allowRemoveTime})}>
+                        <TristateCheckBox color='#0065FF' check={eventOption.allowRemoveTime}/>
+                        <Text style={{fontWeight:500, paddingLeft:5}}>Remove</Text>
+                        <Text> propose time</Text>
+                    </Pressable>
+                    
+                </View>
+
+                <Pressable style={[styles.rowAlignCenter,{marginBottom:5}]} 
+                    onPress={()=>setEventOption({...eventOption, joinViaCode: !eventOption.joinViaCode})}>
+                    <TristateCheckBox color='#0065FF' check={eventOption.joinViaCode} />
+                    <Text>Join via code without invitation</Text>
+                </Pressable>
             </View>}
 
-            <View style={{alignItems:'flex-start'}}>
+            <View style={{alignItems:'flex-start', flexDirection:'row', gap:10}}>
                 <Pressable 
                     style={[
                         styles.popButton, {
@@ -461,6 +531,16 @@ export function EventPage({ route, navigation,
                     onPress={()=>{handleSubmit()}}>
                     <Text style={{fontWeight:500,fontSize:15.5,color:'#eee'}}>Save changes</Text>
                 </Pressable>
+
+                {isOrganizer && <Pressable 
+                    style={[
+                        styles.popButton, {
+                        paddingHorizontal:20,
+                        backgroundColor:'#dc3545'
+                    }]}
+                    onPress={()=>{handleDelete()}}>
+                    <Text style={{fontWeight:500,fontSize:15.5,color:'#eee'}}>Delete Event</Text>
+                </Pressable>}
             </View>
             <View style={{height:100}}/>
             </View>
