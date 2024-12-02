@@ -54,7 +54,7 @@ function RegisterScreen({ navigation, type }) {
             break;
           }
           case(AuthErrorCodes.INVALID_EMAIL): {
-            setErrMessage(['email','Invail email']);
+            setErrMessage(['email','Invaild email']);
             break;
           }
           case(AuthErrorCodes.WEAK_PASSWORD): {
@@ -140,7 +140,7 @@ function RegisterScreen({ navigation, type }) {
                 onBlur={() => onBlur()}
               />
 
-              {errMessage[0] == 'email' ? 
+              {errMessage[0] == 'name' ? 
               <Text style={styles.redText}>
                 {errMessage[1]}
               </Text> : <></>}

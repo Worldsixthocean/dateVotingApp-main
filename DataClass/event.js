@@ -124,7 +124,7 @@ export async function newFetchEvent(id){
     if (docSnap.exists()) {
       resolve(docSnap.data());
     } else {
-      reject(new Error("No such document!"));
+      reject(new Error("This event does not exist. Are you giving a wrong code?"));
     }
   })
 }

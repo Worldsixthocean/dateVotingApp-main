@@ -19,7 +19,13 @@ export default function WeekView({date = new Date(), events = [], Duration = 15,
     let week = [];
     for(i = 0 ; i < 7; i++){
         week.push(dateHelper.daysAfter(startDate, i));
-    } 
+    }
+    
+    const monthString = startDate.getMonth() == week[6].getMonth() ?
+        dateHelper.monthToString(startDate.getMonth()) + ' ' + startDate.getFullYear() :  
+        dateHelper.monthToString(startDate.getMonth()) + ' ' + startDate.getFullYear() +
+        ' / '+ dateHelper.monthToString(week[6].getMonth()) + ' ' + week[6].getFullYear();
+
 
     //filteredEvents do 3 things: 
     //filter proposed time to week
@@ -44,8 +50,8 @@ export default function WeekView({date = new Date(), events = [], Duration = 15,
     let tableHeight = 700;
 
     return(
-        <View style={{backgroundColor:'#ddd', height:300, borderRadius:20, padding:15}}>
-
+        <View style={{backgroundColor:'#ddd', height:350, borderRadius:20, padding:15}}>
+            <Text style={{flexDirection:'row',paddingLeft:5,paddingBottom:10, fontSize:15, fontWeight:500}}>{monthString}</Text>
             <View style={{flexDirection:'row',paddingBottom:13}}>
                 <Pressable style={{marginTop:5}} onPress={onLastWeek}><Icon name="keyboard-arrow-left" size={23}/></Pressable>
                 {week.map((d,i)=><WeekDayView date={d} key={i} style={{flex:1}}/>)}

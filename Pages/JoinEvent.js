@@ -1,7 +1,9 @@
-import { View ,Text, Pressable, TextInput, ScrollView, Alert} from 'react-native';
+import { View ,Text, Pressable, TextInput, ScrollView, Alert,TouchableOpacity,Button} from 'react-native';
 import { useState, useEffect, useContext } from 'react';
 import importStyle from '../style.js';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+
+import { CameraView, CameraType, useCameraPermissions } from 'expo-camera';
 
 import { joinEvent } from '../DataClass/event.js';
 
@@ -78,10 +80,48 @@ function JoinHome({ navigation }) {
 }
 
 function JoinQR({ navigation }) {
-    return(
-        <View style={{height:'100%',padding:25, gap:25}}>
-
+    const user = useContext(UserContext);
+    const [scanned, setScanned] = useState(false);
+    const [permission, requestPermission] = useCameraPermissions();
+  
+    if (!permission) {
+      return <View />;
+    }
+  
+    if (!permission.granted) {
+      return (
+        <View>
+          <Text>We need your permission to show the camera</Text>
+          <Button onPress={requestPermission} title="grant permission" />
         </View>
-    )
+      );
+    }
+  
+    return (
+      <View style={{width:'100%', height:'100%'}}>
+        <CameraView style={{flex: 1}}
+            barcodeScannerSettings={{barcodeTypes: ["qr"]}}
+            onBarcodeScanned={(result)=>{
+                if(!scanned){
+                    console.log('scanned')
+                    setScanned(true)
+                    
+                    joinEvent(result.data,user.uid)
+                    .then(()=>{
+                        navigation.navigate('Events', {screen: 'List'});
+                    })
+                    .catch( (e) =>
+                        Alert.alert('Something\'s wrong.', e.message , [
+                        {text: 'OK', onPress: () => {setScanned(false)}}])
+                )}
 
+            }}
+        >
+          <View style={{flex: 1}}>
+              <Text style={{color:'#fff'}}> </Text>
+          </View>
+        </CameraView>
+      </View>
+    );
+  
 }

@@ -279,7 +279,11 @@ export function EventPage({ route, navigation,
         }
     })
 
-    //console.log(imgType);
+    const maxVote=times.reduce( 
+        (accumulator, currentValue) => 
+            accumulator > (currentValue.available.length +  currentValue.maybe.length) ? 
+            accumulator : (currentValue.available.length +  currentValue.maybe.length)
+        , 0);
 
     //find image after getting doc
     useEffect(() => {
@@ -454,11 +458,12 @@ export function EventPage({ route, navigation,
                     <View style={[{marginBottom:10}]} key={index}> 
 
                         <DateRow 
-                            date={dateHelper.dateToString(date.date.toDate())} 
+                            date={date.date.toDate()} 
                             index={index} 
                             times={times} 
                             setTimes={setTimes}
-                            showClose={isOrganizer || eventOption.allowRemoveTime}>
+                            showClose={isOrganizer || eventOption.allowRemoveTime}
+                            maxVote={maxVote}>
                         </DateRow>
                         
                     <View style={styles.seperator}/>
@@ -466,11 +471,11 @@ export function EventPage({ route, navigation,
                 )})}
 
                 {(isOrganizer||eventOption.allowAddTime) && <Pressable 
-                    style={styles.outlineButton}
+                    style={{backgroundColor:'#fff', elevation:2, padding:15, borderRadius:18}}
                     onPress={()=>{showDatepicker()}}
                 >
-                    <Text style={[]}>
-                        + Propose new date
+                    <Text style={{fontSize:15,fontWeight:500}}>
+                        +  Propose new date
                     </Text>
                 </Pressable>}
             </View>
@@ -483,13 +488,17 @@ export function EventPage({ route, navigation,
 
                     <Pressable style={styles.rowAlignCenter}
                         onPress={()=>setEventOption({...eventOption, allowAddAttendees: !eventOption.allowAddAttendees})}>
-                        <TristateCheckBox color='#0065FF' check={eventOption.allowAddAttendees}/>
+                        <TristateCheckBox 
+                            onPress={()=>setEventOption({...eventOption, allowAddAttendees: !eventOption.allowAddAttendees})}
+                            color='#0065FF' check={eventOption.allowAddAttendees}/>
                         <Text style={{fontWeight:500, paddingHorizontal:5}}>Add</Text>
                     </Pressable>
 
                     <Pressable style={styles.rowAlignCenter}
                         onPress={()=>setEventOption({...eventOption, allowRemoveAttendees: !eventOption.allowRemoveAttendees})}>
-                        <TristateCheckBox color='#0065FF' check={eventOption.allowRemoveAttendees}/>
+                        <TristateCheckBox 
+                            onPress={()=>setEventOption({...eventOption, allowRemoveAttendees: !eventOption.allowRemoveAttendees})}
+                            color='#0065FF' check={eventOption.allowRemoveAttendees}/>
                         <Text style={{fontWeight:500, paddingLeft:5}}>Remove</Text>
                     </Pressable>
 
@@ -501,13 +510,17 @@ export function EventPage({ route, navigation,
 
                     <Pressable style={styles.rowAlignCenter}
                         onPress={()=>setEventOption({...eventOption, allowAddTime: !eventOption.allowAddTime})}> 
-                        <TristateCheckBox color='#0065FF' check={eventOption.allowAddTime}/>
+                        <TristateCheckBox 
+                            onPress={()=>setEventOption({...eventOption, allowAddTime: !eventOption.allowAddTime})}
+                            color='#0065FF' check={eventOption.allowAddTime}/>
                         <Text style={{fontWeight:500, paddingHorizontal:5}}>Add</Text>
                     </Pressable>
 
                     <Pressable style={styles.rowAlignCenter}
                         onPress={()=>setEventOption({...eventOption, allowRemoveTime: !eventOption.allowRemoveTime})}>
-                        <TristateCheckBox color='#0065FF' check={eventOption.allowRemoveTime}/>
+                        <TristateCheckBox 
+                            onPress={()=>setEventOption({...eventOption, allowRemoveTime: !eventOption.allowRemoveTime})}
+                            color='#0065FF' check={eventOption.allowRemoveTime}/>
                         <Text style={{fontWeight:500, paddingLeft:5}}>Remove</Text>
                         <Text> propose time</Text>
                     </Pressable>
@@ -516,7 +529,9 @@ export function EventPage({ route, navigation,
 
                 <Pressable style={[styles.rowAlignCenter,{marginBottom:5}]} 
                     onPress={()=>setEventOption({...eventOption, joinViaCode: !eventOption.joinViaCode})}>
-                    <TristateCheckBox color='#0065FF' check={eventOption.joinViaCode} />
+                    <TristateCheckBox 
+                        onPress={()=>setEventOption({...eventOption, joinViaCode: !eventOption.joinViaCode})}
+                        color='#0065FF' check={eventOption.joinViaCode} />
                     <Text>Join via code without invitation</Text>
                 </Pressable>
             </View>}

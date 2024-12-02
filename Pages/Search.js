@@ -15,6 +15,8 @@ import importStyle from '../style.js'
 import { DefaultTheme } from '@react-navigation/native';
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
 
+import QRCode from 'react-native-qrcode-svg';
+
 import * as Clipboard from 'expo-clipboard';
 
 const Tab = createMaterialTopTabNavigator();
@@ -72,7 +74,7 @@ function Screen({route, navigation,
       </Tab.Screen>
       <Tab.Screen name="Join by Code">
         {(props) => <MessagesScreen eventID={route.params.eventID} newEvent={route.params.newEvent}/>}
-        </Tab.Screen>
+      </Tab.Screen>
     </Tab.Navigator>
   );
 }
@@ -98,12 +100,17 @@ function MessagesScreen({eventID, newEvent}) {
         <Text style={{fontWeight:500, fontSize:22, marginBottom:15}}>Join Via Code</Text>
         <Text style={{marginBottom:5}}>Enter this code in 'Join Event' to add attendees:</Text>
         <Pressable 
-          style={{ backgroundColor:"#dfdfdf", padding:10, borderRadius:13, width:'100%',
+          style={{ backgroundColor:"#dfdfdf", padding:10, marginBottom:15, borderRadius:13, width:'100%',
             flexDirection:'row', alignItems:'center'}}
           onPress={ async()=>{await Clipboard.setStringAsync(eventID)}}>
           <Text style={{fontWeight:500, fontSize:17, flex:1, textAlign:'center'}}>{eventID}</Text>
           <Icon name="content-copy" size={20} color="#888"/>
         </Pressable>
+        <Text style={{marginBottom:15}}>Or, simply scan this QR Code in the "Join Event" Page:</Text>
+
+        <View style={{backgroundColor:'#fff', elevation:2, padding:20, borderRadius:18}}>
+          <QRCode size={125} value={eventID}/>
+        </View>
       </>
       : newEvent ? 
       <Text style={{color:'#777'}}>You can enable join by code after creating a new event.</Text>

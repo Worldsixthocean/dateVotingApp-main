@@ -73,18 +73,6 @@ function HomeScreen({ navigation, alert, setAlert }) {
             paddingLeft: insets.left + 18,
             paddingRight: insets.right+ 18
         }}>
-
-            <View style={{marginVertical:5}}/>
-            <Button title="Alert" onPress={()=>
-              Alert.alert('Alert Title', 'My Alert Msg', [
-                {
-                  text: 'Cancel',
-                  onPress: () => console.log('Cancel Pressed'),
-                  style: 'cancel',
-                },
-                {text: 'OK', onPress: () => console.log('OK Pressed')},
-              ])
-            }/>
         </View>
       </View>
   );
